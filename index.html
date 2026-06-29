@@ -5,6 +5,7 @@ HTML
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Diario de Ruta de Jose</title>
+    <!-- Leaflet CSS para los mapas -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body { font-family: 'Arial', sans-serif; margin: 0; background-color: #f4f6f9; color: #333; line-height: 1.25; }
@@ -14,8 +15,17 @@ HTML
         .tab-button.active { color: white; background-color: #16a085; }
         .tab-content { display: none; padding: 15px; }
         .tab-content.active { display: block; }
-        .map-container { height: 350px; width: 100%; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        .panel { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        
+        /* DISEÑO DE MAPAS EN PARALELO CON SOMBREADO */
+        .map-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 15px; }
+        @media (max-width: 768px) { .map-grid { grid-template-columns: 1fr; } }
+        
+        .map-wrapper { background: white; padding: 8px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .map-title-inside { font-size: 12px; font-weight: bold; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px; padding-left: 4px; }
+        .map-container { height: 380px; width: 100%; border-radius: 8px; }
+        .map-focus { height: 380px; width: 100%; border-radius: 8px; }
+        
+        .panel { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
         h2 { color: #2c3e50; margin-top: 0; border-bottom: 2px solid #ecf0f1; padding-bottom: 5px; font-size: 18px; }
         .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; text-align: center; }
         .stat-box { background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px solid #e9ecef; }
@@ -38,13 +48,25 @@ HTML
     <button class="tab-button" onclick="openTab('conquistas')">🐚 Mis Conquistas</button>
 </div>
 
+<!-- DESAFÍO PANAMERICANO -->
 <div id="alaska" class="tab-content active">
-    <div id="mapAlaska" class="map-container"></div>
+    <!-- Grid de mapas con sombras -->
+    <div class="map-grid">
+        <div class="map-wrapper">
+            <div class="map-title-inside">🗺️ Mapa General de la Ruta (Zoom Libre)</div>
+            <div id="mapAlaska" class="map-container"></div>
+        </div>
+        <div class="map-wrapper">
+            <div class="map-title-inside">🔍 Enfoque Posición Actual (Zoom Detalle)</div>
+            <div id="mapAlaskaFocus" class="map-focus"></div>
+        </div>
+    </div>
+
     <div class="panel">
         <h2>📊 Cuadro de Mandos - Día 0 (Simulacro)</h2>
         <div class="stats-grid">
             <div class="stat-box"><div class="stat-val" id="ak-km">0 / 24.000 km</div><div class="stat-lbl">Distancia Recorrida</div></div>
-            <div class="stat-box"><div class="stat-val" id="ak-money">6.000,00 €</div><div class="stat-lbl">Monedero Virtual</div></div>
+            <div class="stat-box"><div class="stat-val">6.000,00 €</div><div class="stat-lbl">Monedero Virtual</div></div>
             <div class="stat-box"><div class="stat-val">-40 °C</div><div class="stat-lbl">Mínima Histórica</div></div>
             <div class="stat-box"><div class="stat-val">24 °C</div><div class="stat-lbl">Máxima Histórica</div></div>
         </div>
@@ -62,19 +84,29 @@ HTML
     </div>
     <div class="panel">
         <h2>📖 Diario de Bitácora</h2>
-        <p id="ak-journal"><strong>Punto de partida: Prudhoe Bay (Deadhorse), Alaska.</strong> Estás en el lugar más al norte del continente accesible por carretera. El viento ártico sopla con fuerza. Todo listo para empezar a sumar kilómetros reales a partir del 1 de julio.</p>
+        <p><strong>Punto de partida: Prudhoe Bay (Deadhorse), Alaska.</strong> Estás en el lugar más al norte del continente accesible por carretera. El viento ártico sopla con fuerza. Todo listo para empezar a sumar kilómetros reales a partir del 1 de julio.</p>
     </div>
 </div>
 
+<!-- DESAFÍO TAILANDIA -->
 <div id="tailandia" class="tab-content">
     <div class="alert-box">🌫️ SISTEMA EN "NIEBLA DE GUERRA": Camina para desbloquear las etapas y el transporte público de Tailandia.</div>
-    <div id="mapThailand" class="map-container"></div>
+    
+    <div class="map-grid">
+        <div class="map-wrapper">
+            <div class="map-title-inside">🗺️ Mapa General de Tailandia</div>
+            <div id="mapThailand" class="map-container"></div>
+        </div>
+        <div class="map-wrapper">
+            <div class="map-title-inside">🔍 Enfoque Próxima Estación (🔒 Bloqueado)</div>
+            <div id="mapThailandFocus" class="map-focus"></div>
+        </div>
+    </div>
+
     <div class="panel">
         <h2>📊 Progreso en el Sudeste Asiático</h2>
         <div class="stats-grid">
-            <div class="stats-grid" style="grid-column: span 2;">
-                <div class="stat-box"><div class="stat-val">🔒 Oculto</div><div class="stat-lbl">Próxima Estación</div></div>
-            </div>
+            <div class="stat-box" style="grid-column: span 2;"><div class="stat-val">🔒 Oculto</div><div class="stat-lbl">Próxima Estación</div></div>
         </div>
     </div>
     <div class="panel">
@@ -83,12 +115,17 @@ HTML
     </div>
 </div>
 
+<!-- MIS CONQUISTAS REALES -->
 <div id="conquistas" class="tab-content">
     <div class="map-title">🐚 Mi Camino de Santiago (Francia - Galicia)</div>
-    <div id="mapCamino" class="map-container" style="height: 250px;"></div>
+    <div class="map-wrapper" style="margin-bottom: 20px;">
+        <div id="mapCamino" style="height: 250px; width:100%; border-radius: 8px;"></div>
+    </div>
     
     <div class="map-title">🗺️ Pasaporte Mundial (Países Visitados)</div>
-    <div id="mapMundo" class="map-container" style="height: 250px;"></div>
+    <div class="map-wrapper" style="margin-bottom: 20px;">
+        <div id="mapMundo" style="height: 250px; width:100%; border-radius: 8px;"></div>
+    </div>
 
     <div class="panel">
         <h2>🐚 Estado del Camino de Santiago</h2>
@@ -100,6 +137,7 @@ HTML
     </div>
 </div>
 
+<!-- Leaflet JS para mapas -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     function openTab(tabId) {
@@ -112,17 +150,27 @@ HTML
         setTimeout(invalidateMaps, 100);
     }
 
-    var mapAK, mapTH, mapCM, mapWD;
+    var mapAK, mapAKF, mapTH, mapTHF, mapCM, mapWD;
     
     function initMaps() {
-        // 1. Mapa Alaska
-        mapAK = L.map('mapAlaska').setView([70.255, -148.359], 4);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapAK);
-        L.marker([70.255, -148.359]).addTo(mapAK).bindPopup('<b>Inicio: Prudhoe Bay</b>').openPopup();
+        var posActualAlaska = [70.255, -148.359];
+        var posActualTailandia = [13.756, 100.501]; // Bangkok base
 
-        // 2. Mapa Tailandia
-        mapTH = L.map('mapThailand').setView([13.756, 100.501], 5);
+        // 1. Mapas Alaska
+        mapAK = L.map('mapAlaska').setView(posActualAlaska, 3);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapAK);
+        L.marker(posActualAlaska).addTo(mapAK).bindPopup('<b>Posición Actual</b>');
+
+        mapAKF = L.map('mapAlaskaFocus').setView(posActualAlaska, 13); // Zoom máximo de detalle
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapAKF);
+        L.marker(posActualAlaska).addTo(mapAKF).bindPopup('<b>Estás aquí: Prudhoe Bay</b>').openPopup();
+
+        // 2. Mapas Tailandia
+        mapTH = L.map('mapThailand').setView(posActualTailandia, 5);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapTH);
+        
+        mapTHF = L.map('mapThailandFocus').setView(posActualTailandia, 5); // Bloqueado/esperando
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapTHF);
         
         // 3. Mapa Camino de Santiago
         mapCM = L.map('mapCamino').setView([42.500, -5.500], 6);
@@ -142,7 +190,6 @@ HTML
         mapWD = L.map('mapMundo').setView([20.0, 0.0], 2);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapWD);
 
-        // Lista de países y ciudades visitados por Jose
         var viajes = [
             {coords: [-35.675, -71.543], nombre: "Chile 🇨🇱"},
             {coords: [9.748, -83.753], nombre: "Costa Rica 🇨🇷"},
@@ -166,7 +213,9 @@ HTML
 
     function invalidateMaps() {
         if(mapAK) mapAK.invalidateSize();
+        if(mapAKF) mapAKF.invalidateSize();
         if(mapTH) mapTH.invalidateSize();
+        if(mapTHF) mapTHF.invalidateSize();
         if(mapCM) mapCM.invalidateSize();
         if(mapWD) mapWD.invalidateSize();
     }
