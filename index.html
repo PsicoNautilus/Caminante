@@ -5,7 +5,6 @@ HTML
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Diario de Ruta de Jose</title>
-    <!-- Leaflet CSS para los mapas -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body { font-family: 'Arial', sans-serif; margin: 0; background-color: #f4f6f9; color: #333; line-height: 1.25; }
@@ -48,16 +47,14 @@ HTML
     <button class="tab-button" onclick="openTab('conquistas')">🐚 Mis Conquistas</button>
 </div>
 
-<!-- DESAFÍO PANAMERICANO -->
 <div id="alaska" class="tab-content active">
-    <!-- Grid de mapas con sombras -->
     <div class="map-grid">
         <div class="map-wrapper">
-            <div class="map-title-inside">🗺️ Mapa General de la Ruta (Zoom Libre)</div>
+            <div class="map-title-inside">🗺️ Mapa General de la Ruta (Usa el botón de arriba a la derecha para cambiar a Satélite)</div>
             <div id="mapAlaska" class="map-container"></div>
         </div>
         <div class="map-wrapper">
-            <div class="map-title-inside">🔍 Enfoque Posición Actual (Zoom Detalle)</div>
+            <div class="map-title-inside">🔍 Enfoque Posición Actual</div>
             <div id="mapAlaskaFocus" class="map-focus"></div>
         </div>
     </div>
@@ -88,7 +85,6 @@ HTML
     </div>
 </div>
 
-<!-- DESAFÍO TAILANDIA -->
 <div id="tailandia" class="tab-content">
     <div class="alert-box">🌫️ SISTEMA EN "NIEBLA DE GUERRA": Camina para desbloquear las etapas y el transporte público de Tailandia.</div>
     
@@ -115,7 +111,6 @@ HTML
     </div>
 </div>
 
-<!-- MIS CONQUISTAS REALES -->
 <div id="conquistas" class="tab-content">
     <div class="map-title">🐚 Mi Camino de Santiago (Francia - Galicia)</div>
     <div class="map-wrapper" style="margin-bottom: 20px;">
@@ -137,7 +132,6 @@ HTML
     </div>
 </div>
 
-<!-- Leaflet JS para mapas -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     function openTab(tabId) {
@@ -150,31 +144,46 @@ HTML
         setTimeout(invalidateMaps, 100);
     }
 
+    // Función auxiliar para generar las dos capas (Calles y Satélite) para cada mapa
+    function createTileLayers() {
+        return {
+            "Mapa": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
+            "Satélite": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            })
+        };
+    }
+
     var mapAK, mapAKF, mapTH, mapTHF, mapCM, mapWD;
     
     function initMaps() {
         var posActualAlaska = [70.255, -148.359];
-        var posActualTailandia = [13.756, 100.501]; // Bangkok base
+        var posActualTailandia = [13.756, 100.501];
 
-        // 1. Mapas Alaska
-        mapAK = L.map('mapAlaska').setView(posActualAlaska, 3);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapAK);
+        // 1. Configuración Mapas Alaska
+        var layersAK = createTileLayers();
+        mapAK = L.map('mapAlaska', { center: posActualAlaska, zoom: 3, layers: [layersAK["Mapa"]] });
+        L.control.layers(layersAK).addTo(mapAK);
         L.marker(posActualAlaska).addTo(mapAK).bindPopup('<b>Posición Actual</b>');
 
-        mapAKF = L.map('mapAlaskaFocus').setView(posActualAlaska, 13); // Zoom máximo de detalle
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapAKF);
+        var layersAKF = createTileLayers();
+        mapAKF = L.map('mapAlaskaFocus', { center: posActualAlaska, zoom: 14, layers: [layersAKF["Satélite"]] }); // Por defecto en satélite para molar más
+        L.control.layers(layersAKF).addTo(mapAKF);
         L.marker(posActualAlaska).addTo(mapAKF).bindPopup('<b>Estás aquí: Prudhoe Bay</b>').openPopup();
 
-        // 2. Mapas Tailandia
-        mapTH = L.map('mapThailand').setView(posActualTailandia, 5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapTH);
+        // 2. Configuración Mapas Tailandia
+        var layersTH = createTileLayers();
+        mapTH = L.map('mapThailand', { center: posActualTailandia, zoom: 5, layers: [layersTH["Mapa"]] });
+        L.control.layers(layersTH).addTo(mapTH);
         
-        mapTHF = L.map('mapThailandFocus').setView(posActualTailandia, 5); // Bloqueado/esperando
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapTHF);
+        var layersTHF = createTileLayers();
+        mapTHF = L.map('mapThailandFocus', { center: posActualTailandia, zoom: 5, layers: [layersTHF["Mapa"]] });
+        L.control.layers(layersTHF).addTo(mapTHF);
         
-        // 3. Mapa Camino de Santiago
-        mapCM = L.map('mapCamino').setView([42.500, -5.500], 6);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapCM);
+        // 3. Configuración Mapa Camino de Santiago (con capas intercambiables)
+        var layersCM = createTileLayers();
+        mapCM = L.map('mapCamino', { center: [42.500, -5.500], zoom: 6, layers: [layersCM["Mapa"]] });
+        L.control.layers(layersCM).addTo(mapCM);
 
         var sjpp = [43.163, -1.239], belorado = [42.419, -3.193], ocebreiro = [42.709, -7.042], santiago = [42.880, -8.545];
         L.marker(sjpp).addTo(mapCM).bindPopup('<b>St-Jean-Pied-de-Port</b>');
@@ -186,9 +195,10 @@ HTML
         L.polyline([belorado, [42.343, -3.696], [42.598, -5.567], ocebreiro], {color: 'orange', weight: 3, dashArray: '5, 10'}).addTo(mapCM);
         L.polyline([ocebreiro, [42.774, -7.863], santiago], {color: 'green', weight: 4}).addTo(mapCM);
 
-        // 4. Mapamundi de Conquistas
-        mapWD = L.map('mapMundo').setView([20.0, 0.0], 2);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapWD);
+        // 4. Configuración Mapamundi de Conquistas (con capas intercambiables)
+        var layersWD = createTileLayers();
+        mapWD = L.map('mapMundo', { center: [20.0, 0.0], zoom: 2, layers: [layersWD["Mapa"]] });
+        L.control.layers(layersWD).addTo(mapWD);
 
         var viajes = [
             {coords: [-35.675, -71.543], nombre: "Chile 🇨🇱"},
