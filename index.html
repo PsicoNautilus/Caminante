@@ -3,248 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Diario de Ruta de Jose</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>Desafío de Caminatas: Panamericana y Tailandia</title>
     <style>
-        body { font-family: 'Arial', sans-serif; margin: 0; background-color: #f4f6f9; color: #333; line-height: 1.25; }
-        header { background-color: #2c3e50; color: white; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; }
-        .tabs { display: flex; justify-content: space-around; background-color: #34495e; }
-        .tab-button { background: none; border: none; color: #bdc3c7; padding: 12px; cursor: pointer; font-size: 15px; font-weight: bold; flex-grow: 1; text-align: center; transition: 0.3s; }
-        .tab-button.active { color: white; background-color: #16a085; }
-        .tab-content { display: none; padding: 15px; }
-        .tab-content.active { display: block; }
-        
-        /* DISEÑO DE MAPAS EN PARALELO CON SOMBREADO */
-        .map-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 15px; }
-        @media (max-width: 768px) { .map-grid { grid-template-columns: 1fr; } }
-        
-        .map-wrapper { background: white; padding: 8px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
-        .map-title-inside { font-size: 12px; font-weight: bold; color: #7f8c8d; text-transform: uppercase; margin-bottom: 5px; padding-left: 4px; letter-spacing: 0.5px; }
-        .map-container { height: 380px; width: 100%; border-radius: 8px; }
-        .map-focus { height: 380px; width: 100%; border-radius: 8px; }
-        
-        .panel { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        h2 { color: #2c3e50; margin-top: 0; border-bottom: 2px solid #ecf0f1; padding-bottom: 5px; font-size: 18px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; }
-        @media (max-width: 480px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-        .stat-box { background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px solid #e9ecef; }
-        .stat-val { font-size: 18px; font-weight: bold; color: #16a085; }
-        .stat-lbl { font-size: 11px; color: #7f8c8d; text-transform: uppercase; }
-        
-        .alert-box { background-color: #fdf2e9; border-left: 5px solid #e67e22; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 13px; font-weight: bold; color: #d35400; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #f2f2f2; font-weight: bold; }
-        .map-title { font-size: 14px; font-weight: bold; color: #34495e; margin: 10px 0 5px 0; }
-        
-        /* ESTILO DIARIO EXTENDIDO */
-        .journal-box { background: #fff; padding: 20px; border-radius: 8px; border-left: 5px solid #2c3e50; line-height: 1.6; }
-        .journal-meta { font-size: 12px; color: #95a5a6; margin-bottom: 8px; font-weight: bold; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #16a085;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            border-left: 4px solid #2980b9;
+        }
+        .stat-box.bonus {
+            border-left-color: #e67e22;
+        }
+        .btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background-color: #219a52;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .market-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .market-table th, .market-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .market-table th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
 
-<header>🌍 EXPEDICIÓN MOCHILERA DE JOSE</header>
+<div class="container">
+    <header>
+        <h1>Desafío de Caminatas Virtuales</h1>
+        <p>Cuaderno de Bitácora Digital y Gamificación</p>
+    </header>
 
-<div class="tabs">
-    <button class="tab-button active" onclick="openTab('alaska')">🏔️ Alaska ➔ Ushuaia</button>
-    <button class="tab-button" onclick="openTab('tailandia')">🇹🇭 Tour Tailandia</button>
-    <button class="tab-button" onclick="openTab('conquistas')">🐚 Mis Conquistas</button>
-</div>
+    <!-- CONTROL DE PASOS DIARIOS -->
+    <div class="card">
+        <h2>Registro de Jornada</h2>
+        <label for="dailySteps">Introduce los pasos de hoy:</label>
+        <input type="number" id="dailySteps" placeholder="Ej. 25000" min="0">
+        <button class="btn" onclick="procesarPasos()">Registrar Pasos y Calcular Monedas</button>
+    </div>
 
-<div id="alaska" class="tab-content active">
-    <div class="map-grid">
-        <div class="map-wrapper">
-            <div id="mapAlaska" class="map-container"></div>
-        </div>
-        <div class="map-wrapper">
-            <div class="map-title-inside">📍 Posición Actual</div>
-            <div id="mapAlaskaFocus" class="map-focus"></div>
+    <!-- ESTADO DEL JUEGO / MONEDERO -->
+    <div class="card">
+        <h2>Estado de la Cartera Virtual</h2>
+        <div class="stats">
+            <div class="stat-box">
+                <h3>Saldo Acumulado</h3>
+                <p id="walletBalance" style="font-size: 24px; font-weight: bold; color: #27ae60;">0 Monedas</p>
+            </div>
+            <div class="stat-box bonus">
+                <h3>Último Logro Épico</h3>
+                <p id="epicStatus" style="color: #7f8c8d;">Ninguno detectado</p>
+            </div>
         </div>
     </div>
 
-    <div class="panel">
-        <h2>📊 Cuadro de Mandos - Día 0 (Simulacro)</h2>
-        <div class="stats-grid">
-            <div class="stat-box"><div class="stat-val" id="ak-km">0 / 24.000 km</div><div class="stat-lbl">Distancia</div></div>
-            <div class="stat-box"><div class="stat-val">6.000,00 €</div><div class="stat-lbl">Monedero</div></div>
-            <div class="stat-box"><div class="stat-val" style="color: #2980b9;">-12 °C</div><div class="stat-lbl">Temp. Actual</div></div>
-            <div class="stat-box"><div class="stat-val" style="color: #e67e22;">82%</div><div class="stat-lbl">Humedad</div></div>
-            <div class="stat-box"><div class="stat-val">-40 °C</div><div class="stat-lbl">Mín. Ruta</div></div>
-            <div class="stat-box"><div class="stat-val">24 °C</div><div class="stat-lbl">Máx. Ruta</div></div>
+    <!-- MAPA URBANO Y DESAFÍO EN TAILANDIA -->
+    <div class="card">
+        <h2>Ruta Tailandia: Día 1 - Bangkok</h2>
+        <p><strong>Punto de Inicio:</strong> Khao San Road, Bangkok.</p>
+        <p>Explora el mapa interactivo urbano. Consulta los puntos clave de interés y la red de transporte local (Metro, Ferry, Tuk-tuk).</p>
+        <div style="background-color: #eef2f3; padding: 15px; border-radius: 6px; text-align: center; color: #7f8c8d; border: 1px dashed #b2bec3;">
+            [Plano Urbano de Bangkok con Zoom Activado]
         </div>
     </div>
-    
-    <div class="panel">
-        <h2>🛒 Cesta de la Compra Local: Prudhoe Bay</h2>
-        <table>
-            <tr><th>Producto</th><th>Precio Est.</th></tr>
-            <tr><td>🥤 Coca-Cola (33cl)</td><td>3,50 $</td></tr>
-            <tr><td>⛽ Gasolina 95 (Litro)</td><td>1,45 $</td></tr>
-            <tr><td>🥛 Leche (Litro)</td><td>2,20 $</td></tr>
-            <tr><td>🥚 Docena de Huevos</td><td>5,80 $</td></tr>
-            <tr><td>🎬 Netflix Mensual</td><td>15,49 $</td></tr>
+
+    <!-- RUTA PANAMERICANA Y COORDENADAS -->
+    <div class="card">
+        <h2>Ruta Panamericana: Tramo Yukón</h2>
+        <p>Navegación minimalista basada en coordenadas matemáticas precisas para los entornos salvajes de Alaska y Canadá.</p>
+        <div style="background-color: #2c3e50; color: #fff; font-family: monospace; padding: 10px; border-radius: 4px; text-align: center;">
+            COORD: 64.0500° N, 139.4333° W (Entrada al Yukón)
+        </div>
+    </div>
+
+    <!-- ÍNDICE MERCADONA -->
+    <div class="card">
+        <h2>Índice Mercadona (Comparador de Coste de Vida)</h2>
+        <p>Comparativa global del precio de artículos básicos y combustible en ruta frente a los precios de referencia de Madrid.</p>
+        <table class="market-table">
+            <thead>
+                <tr>
+                    <th>Artículo / Servicio</th>
+                    <th>Precio Local en Ruta</th>
+                    <th>Ref. Madrid (Mercadona)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Gasolina (Litro)</td>
+                    <td>Variable según tramo</td>
+                    <td>Media Madrid</td>
+                </tr>
+                <tr>
+                    <td>Alimentación básica</td>
+                    <td>Divisa Local</td>
+                    <td>Precio de referencia</td>
+                </tr>
+            </tbody>
         </table>
     </div>
-    
-    <div class="panel">
-        <h2>📖 Diario de Bitácora</h2>
-        <div class="journal-box">
-            <div class="journal-meta">📍 PRUDHOE BAY, ALASKA | COMIENZO DE LA RUTA</div>
-            <p><strong>Punto de partida oficial: Deadhorse (Prudhoe Bay).</strong> Nos encontramos en los márgenes del Océano Ártico, en el asentamiento más septentrional de Norteamérica comunicado por carretera. Este lugar nació ligado a las grandes prospecciones de petróleo y está rodeado de una tundra infinita donde los osos polares, los caribúes y los zorros árticos imponen sus leyes.</p>
-            <p>El viento aquí sopla cortante y el paisaje sobrecoge por su inmensidad. Desde este punto arranca la famosa autopista James Dalton, una pista de grava y hielo de más de 600 kilómetros construida para abastecer el oleoducto transalaskeño. No hay pueblos, no hay cobertura móvil en cientos de millas y la naturaleza es salvaje. Todo está preparado en el cuartel general para que las zapatillas empiecen a devorar el mapa a partir del 1 de julio.</p>
-        </div>
-    </div>
 </div>
 
-<div id="tailandia" class="tab-content">
-    <div class="alert-box">🌫️ SISTEMA EN "NIEBLA DE GUERRA": Camina para desbloquear las etapas y el transporte público de Tailandia.</div>
-    
-    <div class="map-grid">
-        <div class="map-wrapper">
-            <div id="mapThailand" class="map-container"></div>
-        </div>
-        <div class="map-wrapper">
-            <div class="map-title-inside">🔒 Próxima Estación</div>
-            <div id="mapThailandFocus" class="map-focus"></div>
-        </div>
-    </div>
-
-    <div class="panel">
-        <h2>📊 Progreso en el Sudeste Asiático</h2>
-        <div class="stats-grid">
-            <div class="stat-box"><div class="stat-val">0 km</div><div class="stat-lbl">Recorrido</div></div>
-            <div class="stat-box"><div class="stat-val" style="color:#e67e22;">-- °C</div><div class="stat-lbl">Temp. Actual</div></div>
-            <div class="stat-box"><div class="stat-val" style="color:#2980b9;">-- %</div><div class="stat-lbl">Humedad</div></div>
-        </div>
-    </div>
-    <div class="panel">
-        <h2>🍳 La Taberna del Mochilero</h2>
-        <p>Completa tu primer trayecto para desbloquear la primera receta local adaptada con proteínas de alta calidad.</p>
-    </div>
-</div>
-
-<div id="conquistas" class="tab-content">
-    <div class="map-title">🐚 Mi Camino de Santiago (Francia - Galicia)</div>
-    <div class="map-wrapper" style="margin-bottom: 20px;">
-        <div id="mapCamino" style="height: 250px; width:100%; border-radius: 8px;"></div>
-    </div>
-    
-    <div class="map-title">🗺️ Pasaporte Mundial (Países Visitados)</div>
-    <div class="map-wrapper" style="margin-bottom: 20px;">
-        <div id="mapMundo" style="height: 250px; width:100%; border-radius: 8px;"></div>
-    </div>
-</div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    function openTab(tabId) {
-        var contents = document.getElementsByClassName("tab-content");
-        for (var i = 0; i < contents.length; i++) { contents[i].classList.remove("active"); }
-        var buttons = document.getElementsByClassName("tab-button");
-        for (var i = 0; i < buttons.length; i++) { buttons[i].classList.remove("active"); }
-        document.getElementById(tabId).classList.add("active");
-        event.currentTarget.classList.add("active");
-        setTimeout(invalidateMaps, 100);
-    }
+    // Variables iniciales de saldo
+    let saldoMonedas = 0;
 
-    function createTileLayers() {
-        return {
-            "Mapa": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
-            "Satélite": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles &copy; Esri'
-            })
-        };
-    }
+    // Configuración de umbrales ajustables (Variables X, Y, Z)
+    const UMBRAL_REGULAR = 20000; // Valor X de ejemplo
+    const RECOMPENSA_REGULAR = 50; // Valor Y de ejemplo
+    const BONUS_EPICO = 150;      // Valor Z de ejemplo
 
-    var mapAK, mapAKF, mapTH, mapTHF, mapCM, mapWD;
-    
-    function initMaps() {
-        var posActualAlaska = [70.255, -148.359];
-        var posActualTailandia = [13.756, 100.501];
+    function procesarPasos() {
+        const inputPasos = document.getElementById('dailySteps').value;
+        const pasos = parseInt(inputPasos);
 
-        // 1. Configuración Mapas Alaska
-        var layersAK = createTileLayers();
-        mapAK = L.map('mapAlaska', { center: posActualAlaska, zoom: 3, layers: [layersAK["Mapa"]] });
-        L.control.layers(layersAK).addTo(mapAK);
-        L.marker(posActualAlaska).addTo(mapAK);
+        if (isNaN(pasos) || pasos < 0) {
+            alert('Por favor, introduce un número de pasos válido.');
+            return;
+        }
 
-        // Dibujar Trazado de la Ruta Panamericana Completa (Gris) y Tramo Hecho (Verde)
-        var rutaPanamericana = [
-            [70.255, -148.359], // Prudhoe Bay
-            [67.433, -150.141], // Wiseman
-            [65.484, -149.330], // Livengood
-            [64.837, -147.716], // Fairbanks
-            [61.218, -149.900]  // Anchorage (Fin tramo Alaska)
-        ];
-        L.polyline(rutaPanamericana, {color: '#7f8c8d', weight: 4, opacity: 0.7}).addTo(mapAK); // Ruta completa
-        L.polyline([[70.255, -148.359], [70.255, -148.359]], {color: '#2ecc71', weight: 5}).addTo(mapAK); // Progreso actual (Día 0)
+        let gananciasHoy = 0;
+        let logroEpicoCalculado = "Ninguno detectado";
 
-        var layersAKF = createTileLayers();
-        mapAKF = L.map('mapAlaskaFocus', { center: posActualAlaska, zoom: 14, layers: [layersAKF["Satélite"]] });
-        L.control.layers(layersAKF).addTo(mapAKF);
-        L.marker(posActualAlaska).addTo(mapAKF);
+        // 1. Sentencia de Bonificación Base (Si es mayor que X)
+        if (pasos >= UMBRAL_REGULAR) {
+            gananciasHoy += RECOMPENSA_REGULAR;
+        }
 
-        // 2. Configuración Mapas Tailandia
-        var layersTH = createTileLayers();
-        mapTH = L.map('mapThailand', { center: posActualTailandia, zoom: 5, layers: [layersTH["Mapa"]] });
-        L.control.layers(layersTH).addTo(mapTH);
-        
-        var layersTHF = createTileLayers();
-        mapTHF = L.map('mapThailandFocus', { center: posActualTailandia, zoom: 5, layers: [layersTHF["Mapa"]] });
-        L.control.layers(layersTHF).addTo(mapTHF);
-        
-        // 3. Configuración Mapa Camino de Santiago
-        var layersCM = createTileLayers();
-        mapCM = L.map('mapCamino', { center: [42.500, -5.500], zoom: 6, layers: [layersCM["Mapa"]] });
-        L.control.layers(layersCM).addTo(mapCM);
+        // 2. Sentencia de Logro Épico (Si supera los 30.000 pasos)
+        if (pasos >= 30000) {
+            gananciasHoy += BONUS_EPICO;
+            logroEpicoCalculado = "¡Hito Épico Superado (+30k Pasos)! Bonus Añadido.";
+        }
 
-        var sjpp = [43.163, -1.239], belorado = [42.419, -3.193], ocebreiro = [42.709, -7.042], santiago = [42.880, -8.545];
-        L.marker(sjpp).addTo(mapCM).bindPopup('<b>St-Jean-Pied-de-Port</b>');
-        L.marker(belorado).addTo(mapCM).bindPopup('<b>Belorado</b>');
-        L.marker(ocebreiro).addTo(mapCM).bindPopup('<b>O Cebreiro</b>');
-        L.marker(santiago).addTo(mapCM).bindPopup('<b>¡Santiago! 🐚</b>');
+        // Actualizar datos en pantalla
+        saldoMonedas += gananciasHoy;
+        document.getElementById('walletBalance').innerText = saldoMonedas + " Monedas";
+        document.getElementById('epicStatus').innerText = logroEpicoCalculado;
 
-        L.polyline([sjpp, [42.816, -1.643], [42.466, -2.445], belorado], {color: 'green', weight: 4}).addTo(mapCM);
-        L.polyline([belorado, [42.343, -3.696], [42.598, -5.567], ocebreiro], {color: 'orange', weight: 3, dashArray: '5, 10'}).addTo(mapCM);
-        L.polyline([ocebreiro, [42.774, -7.863], santiago], {color: 'green', weight: 4}).addTo(mapCM);
-
-        // 4. Configuración Mapamundi de Conquistas
-        var layersWD = createTileLayers();
-        mapWD = L.map('mapMundo', { center: [20.0, 0.0], zoom: 2, layers: [layersWD["Mapa"]] });
-        L.control.layers(layersWD).addTo(mapWD);
-
-        var viajes = [
-            {coords: [-35.675, -71.543], nombre: "Chile 🇨🇱"},
-            {coords: [9.748, -83.753], nombre: "Costa Rica 🇨🇷"},
-            {coords: [46.227, 2.213], nombre: "Francia 🇫🇷"},
-            {coords: [53.412, -8.243], nombre: "Irlanda 🇮🇪"},
-            {coords: [41.871, 12.567], nombre: "Italia 🇮🇹"},
-            {coords: [48.208, 16.373], nombre: "Viena, Austria 🇦🇹"},
-            {coords: [50.075, 14.437], nombre: "Praga, Rep. Checa 🇨🇿"},
-            {coords: [47.497, 19.040], nombre: "Budapest, Hungría 🇭🇺"},
-            {coords: [20.593, 78.962], nombre: "India 🇮🇳"},
-            {coords: [51.919, 19.145], nombre: "Polonia 🇵🇱"},
-            {coords: [51.165, 10.451], nombre: "Alemania 🇩🇪"},
-            {coords: [28.394, 84.124], nombre: "Nepal 🇳🇵"},
-            {coords: [25.354, 51.183], nombre: "Qatar 🇶🇦"}
-        ];
-
-        viajes.forEach(function(v) {
-            L.marker(v.coords).addTo(mapWD).bindPopup('<b>' + v.nombre + '</b>');
-        });
-    }
-
-    function invalidateMaps() {
-        if(mapAK) mapAK.invalidateSize();
-        if(mapAKF) mapAKF.invalidateSize();
-        if(mapTH) mapTH.invalidateSize();
-        if(mapTHF) mapTHF.invalidateSize();
-        if(mapCM) mapCM.invalidateSize();
-        if(mapWD) mapWD.invalidateSize();
-    }
-
-    window.onload = initMaps;
-</script>
+        alert('Jornada procesada correctamente. Has ganado: ' + gananciasHoy + ' monedas hoy.');
+    </script>
 </body>
 </html>
